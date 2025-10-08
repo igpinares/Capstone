@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'config/supabase_config.dart';
 import 'screens/auth/login.dart';
-import 'screens/home/home.dart';
+import 'screens/home/resident_home.dart';
 import 'services/mock_auth_service.dart';
 
 Future<void> main() async {
@@ -27,7 +25,7 @@ class MyApp extends StatelessWidget {
       home: const AuthChecker(),
       routes: {
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const HomeScreen(),
+        '/home': (context) => const ResidentHomeScreen(),
       },
     );
   }
@@ -48,7 +46,7 @@ class _AuthCheckerState extends State<AuthChecker> {
 
     if (mockAuth.isAuthenticated) {
       // Usuario autenticado -> Ir a Home
-      return const HomeScreen();
+      return const ResidentHomeScreen();
     } else {
       // Usuario no autenticado -> Ir a Login
       return const LoginScreen();

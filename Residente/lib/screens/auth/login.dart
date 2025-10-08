@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/mock_auth_service.dart';
 import '../../utils/responsive.dart';
-import '../home/home.dart';
+import '../home/resident_home.dart';
 import 'register.dart';
 import 'password.dart';
 
@@ -73,7 +73,9 @@ class _LoginScreenState extends State<LoginScreen> {
             // Navegar al home después del login exitoso
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              MaterialPageRoute(
+                builder: (context) => const ResidentHomeScreen(),
+              ),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -422,7 +424,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const RegisterScreen(),
+                                  builder: (context) =>
+                                      const RegisterWizardScreen(),
                                 ),
                               );
                             },

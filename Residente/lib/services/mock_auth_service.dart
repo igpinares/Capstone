@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class MockAuthService {
   static final MockAuthService _instance = MockAuthService._internal();
   factory MockAuthService() => _instance;
