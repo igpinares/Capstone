@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/registration_data.dart';
+import '../../utils/validators.dart';
+import '../../utils/responsive.dart';
 
 class Step2HolderData extends StatefulWidget {
   final RegistrationData registrationData;
@@ -71,31 +73,6 @@ class _Step2HolderDataState extends State<Step2HolderData>
     super.dispose();
   }
 
-  String? _validateRut(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu RUT';
-    }
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu teléfono';
-    }
-    return null;
-  }
-
-  String? _validateBirthYear(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu año de nacimiento';
-    }
-    final year = int.tryParse(value);
-    final currentYear = DateTime.now().year;
-    if (year == null || year < 1900 || year > currentYear) {
-      return 'Año inválido';
-    }
-    return null;
-  }
 
   void _addOtherCondition() {
     final condition = _otherConditionController.text.trim();
@@ -140,31 +117,54 @@ class _Step2HolderDataState extends State<Step2HolderData>
 
   @override
   Widget build(BuildContext context) {
+    final padding = ResponsiveHelper.getResponsivePadding(context);
+    final isTablet = ResponsiveHelper.isTablet(context) ||
+                      ResponsiveHelper.isDesktop(context);
+    
     return Column(
       children: [
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Datos del Titular',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Completa tu información como titular del domicilio',
-                    style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 32),
+          child: ResponsiveContainer(
+            maxWidth: isTablet ? 800 : null,
+            padding: EdgeInsets.zero,
+            child: SingleChildScrollView(
+              padding: padding,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Datos del Titular',
+                      style: TextStyle(
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          context,
+                          mobile: 28,
+                          tablet: 32,
+                          desktop: 36,
+                        ),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Completa tu información como titular del domicilio',
+                      style: TextStyle(
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          context,
+                          mobile: 16,
+                          tablet: 18,
+                          desktop: 18,
+                        ),
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    SizedBox(height: isTablet ? 40 : 32),
 
                   // RUT
                   TextFormField(
                     controller: _rutController,
-                    validator: _validateRut,
+                    validator: Validators.validateRut,
                     decoration: InputDecoration(
                       labelText: 'RUT *',
                       hintText: '12.345.678-9',
@@ -181,7 +181,7 @@ class _Step2HolderDataState extends State<Step2HolderData>
                   // Teléfono
                   TextFormField(
                     controller: _phoneController,
-                    validator: _validatePhone,
+                    validator: Validators.validatePhone,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: 'Teléfono *',
@@ -199,7 +199,7 @@ class _Step2HolderDataState extends State<Step2HolderData>
                   // Año de nacimiento
                   TextFormField(
                     controller: _birthYearController,
-                    validator: _validateBirthYear,
+                    validator: Validators.validateBirthYear,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
                       labelText: 'Año de nacimiento *',
@@ -375,7 +375,37 @@ class _Step2HolderDataState extends State<Step2HolderData>
                       ),
                     ],
                   ),
-                ],
+                  const SizedBox(height: 12),
+                  // Nota adicional para otra condición
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: Colors.blue.shade700,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Ingrese solo condiciones relevantes para el rescate; no registre enfermedades o datos sensibles que no sean útiles para la emergencia.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -383,7 +413,7 @@ class _Step2HolderDataState extends State<Step2HolderData>
 
         // Botones
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: padding,
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [

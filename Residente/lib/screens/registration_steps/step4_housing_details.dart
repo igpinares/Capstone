@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../models/registration_data.dart';
+import '../../utils/responsive.dart';
 
 class Step4HousingDetails extends StatefulWidget {
   final RegistrationData registrationData;
   final VoidCallback onPrevious;
-  final Future<void> Function() onComplete;
+  final VoidCallback onComplete;
 
   const Step4HousingDetails({
     super.key,
@@ -19,34 +20,37 @@ class Step4HousingDetails extends StatefulWidget {
 
 class _Step4HousingDetailsState extends State<Step4HousingDetails> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _specialInstructionsController =
-      TextEditingController();
 
   String? _selectedHousingType;
-  int? _selectedNumberOfFloors;
-  String? _selectedConstructionMaterial;
-  String? _selectedHousingCondition;
+  String? _numberOfFloors;
+  String? _selectedMaterial;
+  String? _selectedCondition;
+  bool _isLoading = false;
 
   final List<String> _housingTypes = [
     'Casa',
     'Departamento',
-    'Cabaña',
-    'Mediagua',
+    'Empresa',
+    'Local comercial',
+    'Oficina',
+    'Bodega',
     'Otro',
   ];
 
   final List<int> _floorOptions = List.generate(62, (index) => index + 1);
 
-  final List<String> _constructionMaterials = [
-    'Hormigón armado',
-    'Albañilería',
+  final List<String> _materials = [
+    'Hormigón/Concreto',
+    'Ladrillo',
     'Madera',
     'Adobe',
+    'Metal',
+    'Material ligero',
     'Mixto',
     'Otro',
   ];
 
-  final List<String> _housingConditions = [
+  final List<String> _conditions = [
     'Excelente',
     'Bueno',
     'Regular',
@@ -58,180 +62,118 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
   void initState() {
     super.initState();
     _selectedHousingType = widget.registrationData.housingType;
-    _selectedNumberOfFloors = widget.registrationData.numberOfFloors;
-    _selectedConstructionMaterial =
-        widget.registrationData.constructionMaterial;
-    _selectedHousingCondition = widget.registrationData.housingCondition;
-    _specialInstructionsController.text =
-        widget.registrationData.specialInstructions ?? '';
+    _numberOfFloors = widget.registrationData.numberOfFloors?.toString();
+    _selectedMaterial = widget.registrationData.constructionMaterial;
+    _selectedCondition = widget.registrationData.housingCondition;
   }
 
-  @override
-  void dispose() {
-    _specialInstructionsController.dispose();
-    super.dispose();
-  }
-
-  String? _validateSelection(String? value, String fieldName) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor selecciona $fieldName';
-    }
-    return null;
-  }
-
-  void _handleComplete() {
+  Future<void> _handleComplete() async {
     if (_formKey.currentState!.validate()) {
       widget.registrationData.housingType = _selectedHousingType;
-      widget.registrationData.numberOfFloors = _selectedNumberOfFloors;
-      widget.registrationData.constructionMaterial =
-          _selectedConstructionMaterial;
-      widget.registrationData.housingCondition = _selectedHousingCondition;
-      widget.registrationData.specialInstructions =
-          _specialInstructionsController.text.trim();
+      widget.registrationData.numberOfFloors = _numberOfFloors != null
+          ? int.parse(_numberOfFloors!)
+          : null;
+      widget.registrationData.constructionMaterial = _selectedMaterial;
+      widget.registrationData.housingCondition = _selectedCondition;
 
-      // Mostrar resumen de los datos antes de enviar
-      _showConfirmationDialog();
-    }
-  }
+      setState(() {
+        _isLoading = true;
+      });
 
-  void _showConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmar Registro'),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
+      // Aquí iría la lógica para guardar en Supabase
+      await Future.delayed(const Duration(seconds: 2));
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+
+        // Mostrar diálogo de éxito
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: Row(
               children: [
-                const Text(
-                  '¿Deseas registrar tu domicilio con la siguiente información?',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Icon(
+                  Icons.check_circle,
+                  color: Colors.green.shade600,
+                  size: 32,
                 ),
-                const SizedBox(height: 16),
-                _buildSummaryItem('Email', widget.registrationData.email ?? ''),
-                _buildSummaryItem('RUT', widget.registrationData.rut ?? ''),
-                _buildSummaryItem(
-                  'Teléfono del titular',
-                  widget.registrationData.phoneNumber ?? '',
-                ),
-                _buildSummaryItem(
-                  'Año de nacimiento',
-                  widget.registrationData.birthYear?.toString() ?? '',
-                ),
-                _buildSummaryItem(
-                  'Dirección',
-                  widget.registrationData.address ?? '',
-                ),
-                _buildSummaryItem(
-                  'Teléfono de emergencia',
-                  widget.registrationData.mainPhone ?? '',
-                ),
-                _buildSummaryItem(
-                  'Tipo de vivienda',
-                  _selectedHousingType ?? '',
-                ),
-                _buildSummaryItem(
-                  'Pisos',
-                  _selectedNumberOfFloors?.toString() ?? '',
-                ),
-                _buildSummaryItem(
-                  'Material',
-                  _selectedConstructionMaterial ?? '',
-                ),
-                _buildSummaryItem('Estado', _selectedHousingCondition ?? ''),
-                if (widget.registrationData.specialInstructions != null &&
-                    widget.registrationData.specialInstructions!.isNotEmpty)
-                  _buildSummaryItem(
-                    'Instrucciones especiales',
-                    widget.registrationData.specialInstructions ?? '',
-                  ),
+                const SizedBox(width: 12),
+                const Text('¡Registro Exitoso!'),
               ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Revisar'),
+            content: const Text(
+              'Tu información ha sido registrada correctamente. Los bomberos podrán acceder a ella en caso de emergencia.',
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _submitRegistration();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade700,
-                foregroundColor: Colors.white,
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  widget.onComplete();
+                },
+                child: const Text('Finalizar'),
               ),
-              child: const Text('Confirmar y Registrar'),
-            ),
-          ],
+            ],
+          ),
         );
-      },
-    );
-  }
-
-  Widget _buildSummaryItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
-          Expanded(child: Text(value)),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _submitRegistration() async {
-    // Aquí iría la lógica para guardar en Supabase
-    // Por ahora solo mostramos un mensaje de éxito
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('✅ ¡Registro completado exitosamente!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
-      ),
-    );
-
-    // Llamar al callback de completado
-    await widget.onComplete();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final padding = ResponsiveHelper.getResponsivePadding(context);
+    final isTablet = ResponsiveHelper.isTablet(context) ||
+                      ResponsiveHelper.isDesktop(context);
+    
     return Column(
       children: [
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Detalles de la Vivienda',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Información adicional sobre la estructura de tu vivienda',
-                    style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 32),
+          child: ResponsiveContainer(
+            maxWidth: isTablet ? 800 : null,
+            padding: EdgeInsets.zero,
+            child: SingleChildScrollView(
+              padding: padding,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Detalles de la Vivienda',
+                      style: TextStyle(
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          context,
+                          mobile: 28,
+                          tablet: 32,
+                          desktop: 36,
+                        ),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Proporciona información adicional sobre tu vivienda que ayudará a los bomberos en caso de emergencia',
+                      style: TextStyle(
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          context,
+                          mobile: 16,
+                          tablet: 18,
+                          desktop: 18,
+                        ),
+                        color: Colors.grey.shade600,
+                        height: 1.4,
+                      ),
+                    ),
+                    SizedBox(height: isTablet ? 40 : 32),
 
                   // Tipo de vivienda
-                  const Text(
-                    'Tipo de vivienda *',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: _selectedHousingType,
                     decoration: InputDecoration(
+                      labelText: 'Tipo de vivienda *',
                       hintText: 'Selecciona el tipo de vivienda',
                       prefixIcon: const Icon(Icons.home_outlined),
                       border: OutlineInputBorder(
@@ -240,8 +182,6 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
                       filled: true,
                       fillColor: Colors.grey.shade50,
                     ),
-                    validator: (value) =>
-                        _validateSelection(value, 'el tipo de vivienda'),
                     items: _housingTypes.map((type) {
                       return DropdownMenuItem(value: type, child: Text(type));
                     }).toList(),
@@ -250,19 +190,22 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
                         _selectedHousingType = value;
                       });
                     },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Por favor selecciona el tipo de vivienda';
+                      }
+                      return null;
+                    },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
                   // Número de pisos
-                  const Text(
-                    'Número de pisos *',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<int>(
-                    initialValue: _selectedNumberOfFloors,
+                  DropdownButtonFormField<String>(
+                    initialValue: _numberOfFloors,
                     decoration: InputDecoration(
-                      hintText: 'Selecciona el número de pisos',
+                      labelText: 'Número de pisos *',
+                      hintText:
+                          'Indica la cantidad total de pisos de la vivienda',
                       prefixIcon: const Icon(Icons.layers_outlined),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -270,12 +213,9 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
                       filled: true,
                       fillColor: Colors.grey.shade50,
                     ),
-                    validator: (value) => value == null
-                        ? 'Por favor selecciona el número de pisos'
-                        : null,
                     items: _floorOptions.map((floors) {
                       return DropdownMenuItem(
-                        value: floors,
+                        value: floors.toString(),
                         child: Text(
                           '$floors ${floors == 1 ? 'piso' : 'pisos'}',
                         ),
@@ -283,22 +223,24 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        _selectedNumberOfFloors = value;
+                        _numberOfFloors = value;
                       });
                     },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Por favor selecciona el número de pisos';
+                      }
+                      return null;
+                    },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
                   // Material de construcción
-                  const Text(
-                    'Material de construcción *',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedConstructionMaterial,
+                    initialValue: _selectedMaterial,
                     decoration: InputDecoration(
-                      hintText: 'Selecciona el material principal',
+                      labelText: 'Material principal de construcción *',
+                      hintText: 'Selecciona el material',
                       prefixIcon: const Icon(Icons.construction_outlined),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -306,11 +248,7 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
                       filled: true,
                       fillColor: Colors.grey.shade50,
                     ),
-                    validator: (value) => _validateSelection(
-                      value,
-                      'el material de construcción',
-                    ),
-                    items: _constructionMaterials.map((material) {
+                    items: _materials.map((material) {
                       return DropdownMenuItem(
                         value: material,
                         child: Text(material),
@@ -318,101 +256,120 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        _selectedConstructionMaterial = value;
+                        _selectedMaterial = value;
                       });
                     },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Por favor selecciona el material';
+                      }
+                      return null;
+                    },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
 
                   // Estado de la vivienda
-                  const Text(
-                    'Estado de la vivienda *',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: _selectedHousingCondition,
+                    initialValue: _selectedCondition,
                     decoration: InputDecoration(
-                      hintText: 'Selecciona el estado general',
-                      prefixIcon: const Icon(Icons.star_outline),
+                      labelText: 'Estado general de la vivienda *',
+                      hintText: 'Selecciona el estado',
+                      prefixIcon: const Icon(
+                        Icons.home_repair_service_outlined,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       filled: true,
                       fillColor: Colors.grey.shade50,
                     ),
-                    validator: (value) =>
-                        _validateSelection(value, 'el estado de la vivienda'),
-                    items: _housingConditions.map((condition) {
+                    items: _conditions.map((condition) {
                       return DropdownMenuItem(
                         value: condition,
-                        child: Row(
-                          children: [
-                            Text(condition),
-                            const SizedBox(width: 8),
-                            _getConditionIcon(condition),
-                          ],
-                        ),
+                        child: Text(condition),
                       );
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        _selectedHousingCondition = value;
+                        _selectedCondition = value;
                       });
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Por favor selecciona el estado';
+                      }
+                      return null;
                     },
                   ),
 
                   const SizedBox(height: 32),
 
-                  // Instrucciones especiales
-                  const Text(
-                    'Instrucciones especiales (opcional)',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _specialInstructionsController,
-                    maxLines: 4,
-                    decoration: InputDecoration(
-                      hintText:
-                          'Información adicional relevante para bomberos (accesos especiales, llaves, etc.)',
-                      alignLabelWithHint: true,
-                      prefixIcon: const Padding(
-                        padding: EdgeInsets.only(bottom: 60),
-                        child: Icon(Icons.info_outlined),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Información adicional
+                  // Resumen de información
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.blue.shade200),
                     ),
-                    child: Row(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.info_outline, color: Colors.blue.shade700),
-                        const SizedBox(width: 12),
-                        const Expanded(
-                          child: Text(
-                            'Esta información ayuda a los bomberos a evaluar riesgos y planificar mejor la respuesta en caso de emergencia.',
-                            style: TextStyle(fontSize: 13),
-                          ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.summarize,
+                              color: Colors.blue.shade700,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              'Resumen de tu información',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Divider(height: 24),
+                        _buildSummaryItem(
+                          'Dirección:',
+                          widget.registrationData.address ?? 'No especificado',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildSummaryItem(
+                          'Tipo:',
+                          _selectedHousingType ?? 'No especificado',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildSummaryItem(
+                          'Pisos:',
+                          _numberOfFloors != null
+                              ? '$_numberOfFloors ${int.parse(_numberOfFloors!) == 1 ? 'piso' : 'pisos'}'
+                              : 'No especificado',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildSummaryItem(
+                          'Material:',
+                          _selectedMaterial ?? 'No especificado',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildSummaryItem(
+                          'Estado:',
+                          _selectedCondition ?? 'No especificado',
+                        ),
+                        const SizedBox(height: 10),
+                        _buildSummaryItem(
+                          'Contacto:',
+                          widget.registrationData.mainPhone ??
+                              'No especificado',
                         ),
                       ],
                     ),
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -420,7 +377,7 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
 
         // Botones
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: padding,
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
@@ -435,7 +392,7 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: widget.onPrevious,
+                  onPressed: _isLoading ? null : widget.onPrevious,
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     side: BorderSide(color: Colors.grey.shade400),
@@ -448,8 +405,9 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
               ),
               const SizedBox(width: 16),
               Expanded(
+                flex: 2,
                 child: ElevatedButton(
-                  onPressed: _handleComplete,
+                  onPressed: _isLoading ? null : _handleComplete,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade600,
                     foregroundColor: Colors.white,
@@ -458,10 +416,22 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Completar Registro',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Completar configuración',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ],
@@ -471,36 +441,28 @@ class _Step4HousingDetailsState extends State<Step4HousingDetails> {
     );
   }
 
-  Widget _getConditionIcon(String condition) {
-    IconData icon;
-    Color color;
-
-    switch (condition) {
-      case 'Excelente':
-        icon = Icons.star;
-        color = Colors.green;
-        break;
-      case 'Bueno':
-        icon = Icons.star_half;
-        color = Colors.lightGreen;
-        break;
-      case 'Regular':
-        icon = Icons.star_border;
-        color = Colors.orange;
-        break;
-      case 'Malo':
-        icon = Icons.warning;
-        color = Colors.deepOrange;
-        break;
-      case 'Muy malo':
-        icon = Icons.dangerous;
-        color = Colors.red;
-        break;
-      default:
-        icon = Icons.help_outline;
-        color = Colors.grey;
-    }
-
-    return Icon(icon, size: 18, color: color);
+  Widget _buildSummaryItem(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 90,
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey.shade700,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ],
+    );
   }
 }

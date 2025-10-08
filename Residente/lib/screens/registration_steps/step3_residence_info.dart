@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/registration_data.dart';
+import '../../utils/validators.dart';
+import '../../utils/responsive.dart';
 
 class Step3ResidenceInfo extends StatefulWidget {
   final RegistrationData registrationData;
@@ -54,30 +56,6 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
     super.dispose();
   }
 
-  String? _validateAddress(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu dirección';
-    }
-    return null;
-  }
-
-  String? _validatePhone(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa un teléfono';
-    }
-    return null;
-  }
-
-  String? _validateCoordinate(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Requerido';
-    }
-    final coordinate = double.tryParse(value);
-    if (coordinate == null) {
-      return 'Coordenada inválida';
-    }
-    return null;
-  }
 
   void _confirmLocation() {
     if (_addressController.text.isNotEmpty) {
@@ -107,26 +85,49 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
 
   @override
   Widget build(BuildContext context) {
+    final padding = ResponsiveHelper.getResponsivePadding(context);
+    final isTablet = ResponsiveHelper.isTablet(context) ||
+                      ResponsiveHelper.isDesktop(context);
+    
     return Column(
       children: [
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Información de la Residencia',
-                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Proporciona los datos básicos de tu vivienda y contactos de emergencia',
-                    style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 32),
+          child: ResponsiveContainer(
+            maxWidth: isTablet ? 800 : null,
+            padding: EdgeInsets.zero,
+            child: SingleChildScrollView(
+              padding: padding,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Información de la Residencia',
+                      style: TextStyle(
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          context,
+                          mobile: 28,
+                          tablet: 32,
+                          desktop: 36,
+                        ),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Proporciona los datos básicos de tu vivienda y contactos de emergencia',
+                      style: TextStyle(
+                        fontSize: ResponsiveHelper.getResponsiveFontSize(
+                          context,
+                          mobile: 16,
+                          tablet: 18,
+                          desktop: 18,
+                        ),
+                        color: Colors.grey.shade600,
+                      ),
+                    ),
+                    SizedBox(height: isTablet ? 40 : 32),
 
                   // Dirección
                   const Text(
@@ -136,7 +137,7 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
                   const SizedBox(height: 8),
                   TextFormField(
                     controller: _addressController,
-                    validator: _validateAddress,
+                    validator: Validators.validateAddress,
                     decoration: InputDecoration(
                       labelText: 'Dirección completa *',
                       hintText: 'Calle, número, comuna, ciudad',
@@ -363,7 +364,8 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
                             const SizedBox(height: 16),
                             TextFormField(
                               controller: _latitudeController,
-                              validator: _validateCoordinate,
+                              validator: (value) =>
+                                  Validators.validateCoordinate(value, true),
                               keyboardType:
                                   const TextInputType.numberWithOptions(
                                     decimal: true,
@@ -382,7 +384,8 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
                             const SizedBox(height: 12),
                             TextFormField(
                               controller: _longitudeController,
-                              validator: _validateCoordinate,
+                              validator: (value) =>
+                                  Validators.validateCoordinate(value, false),
                               keyboardType:
                                   const TextInputType.numberWithOptions(
                                     decimal: true,
@@ -439,7 +442,7 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
 
                   TextFormField(
                     controller: _mainPhoneController,
-                    validator: _validatePhone,
+                    validator: Validators.validatePhone,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       labelText: 'Teléfono principal *',
@@ -472,7 +475,8 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
                       fillColor: Colors.grey.shade50,
                     ),
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -480,7 +484,7 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
 
         // Botones
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: padding,
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [

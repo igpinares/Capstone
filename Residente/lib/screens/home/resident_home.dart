@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../services/mock_auth_service.dart';
+import '../../models/registration_data.dart';
+import '../../utils/responsive.dart';
+import '../edit/edit_residence_info_screen.dart';
+import '../edit/edit_profile_screen.dart';
 
 class ResidentHomeScreen extends StatefulWidget {
-  const ResidentHomeScreen({super.key});
+  final RegistrationData? registrationData;
+
+  const ResidentHomeScreen({super.key, this.registrationData});
 
   @override
   State<ResidentHomeScreen> createState() => _ResidentHomeScreenState();
@@ -12,6 +18,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
+  late RegistrationData _registrationData;
 
   // Datos de ejemplo
   final List<Map<String, dynamic>> _familyMembers = [
@@ -30,6 +37,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _registrationData = widget.registrationData ?? RegistrationData();
   }
 
   @override
@@ -61,51 +69,76 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
     if (shouldLogout == true && mounted) {
       final mockAuth = MockAuthService();
       await mockAuth.signOut();
-      
+
       // Navegar al login
       if (mounted) {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          '/login',
-          (route) => false,
-        );
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/login', (route) => false);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = ResponsiveHelper.isTablet(context) ||
+                      ResponsiveHelper.isDesktop(context);
+    
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor: Colors.green.shade700,
         foregroundColor: Colors.white,
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Mi Información Familiar', style: TextStyle(fontSize: 18)),
+            Text(
+              'Mi Información Familiar',
+              style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(
+                  context,
+                  mobile: 18,
+                  tablet: 20,
+                  desktop: 22,
+                ),
+              ),
+            ),
             Text(
               'Gestiona la información de tu domicilio',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.normal),
+              style: TextStyle(
+                fontSize: ResponsiveHelper.getResponsiveFontSize(
+                  context,
+                  mobile: 12,
+                  tablet: 14,
+                  desktop: 14,
+                ),
+                fontWeight: FontWeight.normal,
+              ),
             ),
           ],
         ),
         actions: [
-          TextButton(
+          IconButton(
             onPressed: _logout,
-            child: const Text(
-              'Cerrar',
-              style: TextStyle(color: Colors.white, fontSize: 15),
+            icon: Icon(
+              Icons.logout,
+              size: isTablet ? 26 : 24,
             ),
+            tooltip: 'Cerrar sesión',
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          _buildFamilyTab(),
-          _buildPetsTab(),
-          _buildResidenceTab(),
-          _buildSettingsTab(),
-        ],
+      body: ResponsiveContainer(
+        maxWidth: isTablet ? 1200 : null,
+        padding: EdgeInsets.zero,
+        child: IndexedStack(
+          index: _currentIndex,
+          children: [
+            _buildFamilyTab(),
+            _buildPetsTab(),
+            _buildResidenceTab(),
+            _buildSettingsTab(),
+          ],
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -115,8 +148,11 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
           });
         },
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blue.shade700,
+        selectedItemColor: Colors.green.shade700,
         unselectedItemColor: Colors.grey.shade600,
+        selectedFontSize: isTablet ? 14 : 12,
+        unselectedFontSize: isTablet ? 12 : 10,
+        iconSize: isTablet ? 28 : 24,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Familia'),
           BottomNavigationBarItem(icon: Icon(Icons.pets), label: 'Mascotas'),
@@ -134,8 +170,10 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
   // TAB FAMILIA
   // ============================================
   Widget _buildFamilyTab() {
+    final padding = ResponsiveHelper.getResponsivePadding(context);
+    
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -144,7 +182,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.blue.shade600, Colors.blue.shade800],
+                colors: [Colors.green.shade600, Colors.green.shade800],
               ),
               borderRadius: BorderRadius.circular(16),
             ),
@@ -368,12 +406,48 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
     );
   }
 
+  // Editar información del domicilio y vivienda
+  void _editResidenceInfo() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditResidenceInfoScreen(
+          registrationData: _registrationData,
+          onSave: (updatedData) {
+            setState(() {
+              _registrationData = updatedData;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  // Editar perfil personal
+  void _editProfile() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfileScreen(
+          registrationData: _registrationData,
+          onSave: (updatedData) {
+            setState(() {
+              _registrationData = updatedData;
+            });
+          },
+        ),
+      ),
+    );
+  }
+
   // ============================================
   // TAB MASCOTAS
   // ============================================
   Widget _buildPetsTab() {
+    final padding = ResponsiveHelper.getResponsivePadding(context);
+    
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -600,8 +674,10 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
   // TAB DOMICILIO
   // ============================================
   Widget _buildResidenceTab() {
+    final padding = ResponsiveHelper.getResponsivePadding(context);
+    
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -668,7 +744,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'No especificada',
+                  _registrationData.address ?? 'No especificada',
                   style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 ),
               ],
@@ -693,13 +769,27 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const Divider(height: 24),
-                _buildDetailRow('Tipo de vivienda', 'No especificado'),
+                _buildDetailRow(
+                  'Tipo de vivienda',
+                  _registrationData.housingType ?? 'No especificado',
+                ),
                 const SizedBox(height: 12),
-                _buildDetailRow('Número de pisos', 'No especificado'),
+                _buildDetailRow(
+                  'Número de pisos',
+                  _registrationData.numberOfFloors != null
+                      ? '${_registrationData.numberOfFloors} ${_registrationData.numberOfFloors == 1 ? 'piso' : 'pisos'}'
+                      : 'No especificado',
+                ),
                 const SizedBox(height: 12),
-                _buildDetailRow('Material de construcción', 'No especificado'),
+                _buildDetailRow(
+                  'Material de construcción',
+                  _registrationData.constructionMaterial ?? 'No especificado',
+                ),
                 const SizedBox(height: 12),
-                _buildDetailRow('Estado de la vivienda', 'Bueno'),
+                _buildDetailRow(
+                  'Estado de la vivienda',
+                  _registrationData.housingCondition ?? 'No especificado',
+                ),
               ],
             ),
           ),
@@ -718,32 +808,37 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Teléfono de emergencia',
+                  'Teléfonos de emergencia',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const Divider(height: 24),
-                _buildDetailRow('Contacto principal', '+56 9 1234 5678'),
+                _buildDetailRow(
+                  'Contacto principal',
+                  _registrationData.mainPhone ?? 'No especificado',
+                ),
+                if (_registrationData.alternatePhone != null &&
+                    _registrationData.alternatePhone!.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _buildDetailRow(
+                    'Contacto alternativo',
+                    _registrationData.alternatePhone!,
+                  ),
+                ],
               ],
             ),
           ),
 
           const SizedBox(height: 20),
 
-          // Botón editar
+          // Botón de edición
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Función de editar próximamente'),
-                  ),
-                );
-              },
+              onPressed: () => _editResidenceInfo(),
               icon: const Icon(Icons.edit),
               label: const Text('Editar información'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade700,
+                backgroundColor: Colors.green.shade700,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -779,9 +874,10 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
   Widget _buildSettingsTab() {
     final mockAuth = MockAuthService();
     final user = mockAuth.currentUser;
+    final padding = ResponsiveHelper.getResponsivePadding(context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -851,13 +947,55 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const Divider(height: 24),
-                _buildSettingRow('RUT:', '12.345.678-9'),
+                _buildSettingRow(
+                  'RUT:',
+                  _registrationData.rut ?? 'No especificado',
+                ),
                 const SizedBox(height: 12),
                 _buildSettingRow('Email:', user?.email ?? 'No especificado'),
                 const SizedBox(height: 12),
-                _buildSettingRow('Teléfono:', '+56 9 1234 5678'),
+                _buildSettingRow(
+                  'Teléfono:',
+                  _registrationData.phoneNumber ?? 'No especificado',
+                ),
                 const SizedBox(height: 12),
-                _buildSettingRow('Edad:', '25 años (2000)'),
+                _buildSettingRow(
+                  'Edad:',
+                  _registrationData.age != null && _registrationData.birthYear != null
+                      ? '${_registrationData.age} años (${_registrationData.birthYear})'
+                      : 'No especificado',
+                ),
+                if (_registrationData.medicalConditions.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  const Divider(height: 24),
+                  Text(
+                    'Condiciones médicas:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: _registrationData.medicalConditions.map((condition) {
+                      return Chip(
+                        label: Text(
+                          condition,
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                        backgroundColor: Colors.red.shade50,
+                        labelStyle: TextStyle(color: Colors.red.shade900),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
               ],
             ),
           ),
@@ -868,17 +1006,11 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen>
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Función de editar perfil próximamente'),
-                  ),
-                );
-              },
+              onPressed: () => _editProfile(),
               icon: const Icon(Icons.edit),
               label: const Text('Editar perfil'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade700,
+                backgroundColor: Colors.purple.shade700,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
@@ -1108,7 +1240,7 @@ class _PersonDialogState extends State<_PersonDialog>
                           children: [
                             TabBar(
                               controller: _tabController,
-                              labelColor: Colors.blue.shade700,
+                              labelColor: Colors.green.shade700,
                               tabs: const [
                                 Tab(text: 'Enfermedades Crónicas'),
                                 Tab(text: 'Movilidad y Sentidos'),

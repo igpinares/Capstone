@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../models/registration_data.dart';
+import '../../utils/validators.dart';
+import '../../utils/responsive.dart';
 
-class Step1CreateAccount extends StatefulWidget {
+class Step1CreateAccount extends StatefulWidget{
   final RegistrationData registrationData;
   final VoidCallback onNext;
 
@@ -39,27 +41,6 @@ class _Step1CreateAccountState extends State<Step1CreateAccount> {
     super.dispose();
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu email';
-    }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Ingresa un email válido';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu contraseña';
-    }
-    if (value.length < 6) {
-      return 'La contraseña debe tener al menos 6 caracteres';
-    }
-    return null;
-  }
-
   String? _validateConfirmPassword(String? value) {
     if (value != _passwordController.text) {
       return 'Las contraseñas no coinciden';
@@ -77,29 +58,52 @@ class _Step1CreateAccountState extends State<Step1CreateAccount> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Crear Cuenta',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Regístrate como titular del domicilio',
-              style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-            ),
-            const SizedBox(height: 32),
+    final padding = ResponsiveHelper.getResponsivePadding(context);
+    final isTablet = ResponsiveHelper.isTablet(context) ||
+                      ResponsiveHelper.isDesktop(context);
+    
+    return ResponsiveContainer(
+      maxWidth: isTablet ? 800 : null,
+      padding: EdgeInsets.zero,
+      child: SingleChildScrollView(
+        padding: padding,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Crear Cuenta',
+                style: TextStyle(
+                  fontSize: ResponsiveHelper.getResponsiveFontSize(
+                    context,
+                    mobile: 28,
+                    tablet: 32,
+                    desktop: 36,
+                  ),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Regístrate como titular del domicilio',
+                style: TextStyle(
+                  fontSize: ResponsiveHelper.getResponsiveFontSize(
+                    context,
+                    mobile: 16,
+                    tablet: 18,
+                    desktop: 18,
+                  ),
+                  color: Colors.grey.shade600,
+                ),
+              ),
+              SizedBox(height: isTablet ? 40 : 32),
 
             // Email
             TextFormField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
-              validator: _validateEmail,
+              validator: Validators.validateEmail,
               decoration: InputDecoration(
                 labelText: 'Email *',
                 hintText: 'ejemplo@correo.com',
@@ -117,7 +121,7 @@ class _Step1CreateAccountState extends State<Step1CreateAccount> {
             TextFormField(
               controller: _passwordController,
               obscureText: _obscurePassword,
-              validator: _validatePassword,
+              validator: Validators.validatePassword,
               decoration: InputDecoration(
                 labelText: 'Contraseña *',
                 hintText: 'Mínimo 6 caracteres',
@@ -213,8 +217,9 @@ class _Step1CreateAccountState extends State<Step1CreateAccount> {
                   ),
                 ),
               ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

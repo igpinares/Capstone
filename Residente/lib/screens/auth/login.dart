@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/mock_auth_service.dart';
 import '../../utils/responsive.dart';
+import '../../utils/validators.dart';
 import '../home/resident_home.dart';
 import 'register.dart';
 import 'password.dart';
@@ -27,26 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu email';
-    }
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Ingresa un email válido';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu contraseña';
-    }
-    if (value.length < 6) {
-      return 'La contraseña debe tener al menos 6 caracteres';
-    }
-    return null;
-  }
 
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
@@ -199,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
-                              validator: _validateEmail,
+                              validator: Validators.validateEmail,
                               style: TextStyle(
                                 fontSize:
                                     ResponsiveHelper.getResponsiveFontSize(
@@ -242,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextFormField(
                               controller: _passwordController,
                               obscureText: _obscurePassword,
-                              validator: _validatePassword,
+                              validator: Validators.validatePassword,
                               style: TextStyle(
                                 fontSize:
                                     ResponsiveHelper.getResponsiveFontSize(

@@ -5,6 +5,7 @@ import '../registration_steps/step1_create_account.dart';
 import '../registration_steps/step2_holder_data.dart';
 import '../registration_steps/step3_residence_info.dart';
 import '../registration_steps/step4_housing_details.dart';
+import '../home/resident_home.dart';
 
 class RegisterWizardScreen extends StatefulWidget {
   const RegisterWizardScreen({super.key});
@@ -57,8 +58,11 @@ class _RegisterWizardScreenState extends State<RegisterWizardScreen> {
     // Navegar al home después del registro exitoso
     if (!mounted) return;
     
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      '/home',
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) =>
+            ResidentHomeScreen(registrationData: _registrationData),
+      ),
       (route) => false,
     );
   }
