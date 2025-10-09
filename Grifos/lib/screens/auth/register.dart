@@ -45,47 +45,85 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() => _isLoading = true);
 
       try {
+        // Paso 1: Registrar usuario en Supabase Auth
         final response = await SupabaseConfig.client.auth.signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
         if (response.user != null) {
-          await SupabaseConfig.client.from('profiles').insert({
-            'id': response.user!.id,
-            'full_name': _fullNameController.text.trim(),
-            'rut': _rutController.text.trim(),
-            'fire_company': _companyController.text.trim(),
-            'email': _emailController.text.trim(),
-            'created_at': DateTime.now().toIso8601String(),
-          });
+          // Paso 2: Guardar información adicional en la tabla profiles
+          try {
+            await SupabaseConfig.client.from('profiles').insert({
+              'id': response.user!.id,
+              'full_name': _fullNameController.text.trim(),
+              'rut': _rutController.text.trim(),
+              'fire_company': _companyController.text.trim(),
+              'email': _emailController.text.trim(),
+            });
 
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(AppConstants.msgRegistroSuccess),
+                  backgroundColor: AppColors.success,
+                  duration: AppConstants.snackbarDuration,
+                ),
+              );
+              Navigator.pop(context);
+            }
+          } on PostgrestException catch (e) {
+            // Error al insertar en la tabla profiles
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Error al guardar el perfil: ${e.message}'),
+                  backgroundColor: AppColors.error,
+                  duration: const Duration(seconds: 5),
+                ),
+              );
+            }
+          }
+        } else {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text(AppConstants.msgRegistroSuccess),
-                backgroundColor: AppColors.success,
-                duration: AppConstants.snackbarDuration,
+                content: Text('Error: No se pudo crear el usuario'),
+                backgroundColor: AppColors.error,
               ),
             );
-            Navigator.pop(context);
           }
         }
       } on AuthException catch (e) {
+        // Errores de autenticación (email duplicado, contraseña débil, etc.)
         if (mounted) {
+          String errorMessage = e.message;
+          
+          // Traducir mensajes comunes de error
+          if (errorMessage.contains('User already registered')) {
+            errorMessage = 'Este correo electrónico ya está registrado';
+          } else if (errorMessage.contains('Password should be at least')) {
+            errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+          } else if (errorMessage.contains('Invalid email')) {
+            errorMessage = 'El correo electrónico no es válido';
+          }
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(e.message),
+              content: Text(errorMessage),
               backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 5),
             ),
           );
         }
       } catch (e) {
+        // Otros errores generales
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error: ${e.toString()}'),
+              content: Text('Error inesperado: ${e.toString()}'),
               backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 5),
             ),
           );
         }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../config/supabase_config.dart';
+import '../../services/mock_auth_service.dart';
+import '../home/home.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -164,39 +164,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
 
       try {
-        final response = await SupabaseConfig.client.auth.signUp(
+        // Usar servicio de autenticación temporal
+        final mockAuth = MockAuthService();
+        final result = await mockAuth.signUp(
           email: _emailController.text.trim(),
           password: _passwordController.text,
+          name: _fullNameController.text.trim(),
         );
 
-        if (response.user != null) {
-          await SupabaseConfig.client.from('profiles').insert({
-            'id': response.user!.id,
-            'full_name': _fullNameController.text.trim(),
-            'rut': _rutController.text.trim(),
-            'fire_company': _companyController.text.trim(),
-            'email': _emailController.text.trim(),
-            'created_at': DateTime.now().toIso8601String(),
-          });
-
-          if (mounted) {
+        if (mounted) {
+          if (result.isSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
-                  '¡Registro exitoso! Verifica tu email para activar tu cuenta.',
+                  '¡Registro exitoso! Bienvenido ${result.user!.name}',
                 ),
                 backgroundColor: Colors.green,
-                duration: Duration(seconds: 4),
+                duration: const Duration(seconds: 3),
               ),
             );
-            Navigator.pop(context);
+            
+            // Navegar al home después del registro exitoso
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(result.error ?? 'Error al registrar'),
+                backgroundColor: Colors.red,
+              ),
+            );
           }
-        }
-      } on AuthException catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message), backgroundColor: Colors.red),
-          );
         }
       } catch (e) {
         if (mounted) {
