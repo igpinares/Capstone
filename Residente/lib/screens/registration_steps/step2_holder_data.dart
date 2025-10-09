@@ -73,7 +73,6 @@ class _Step2HolderDataState extends State<Step2HolderData>
     super.dispose();
   }
 
-
   void _addOtherCondition() {
     final condition = _otherConditionController.text.trim();
     if (condition.isNotEmpty && !_selectedConditions.contains(condition)) {
@@ -118,9 +117,10 @@ class _Step2HolderDataState extends State<Step2HolderData>
   @override
   Widget build(BuildContext context) {
     final padding = ResponsiveHelper.getResponsivePadding(context);
-    final isTablet = ResponsiveHelper.isTablet(context) ||
-                      ResponsiveHelper.isDesktop(context);
-    
+    final isTablet =
+        ResponsiveHelper.isTablet(context) ||
+        ResponsiveHelper.isDesktop(context);
+
     return Column(
       children: [
         Expanded(
@@ -161,249 +161,260 @@ class _Step2HolderDataState extends State<Step2HolderData>
                     ),
                     SizedBox(height: isTablet ? 40 : 32),
 
-                  // RUT
-                  TextFormField(
-                    controller: _rutController,
-                    validator: Validators.validateRut,
-                    decoration: InputDecoration(
-                      labelText: 'RUT *',
-                      hintText: '12.345.678-9',
-                      prefixIcon: const Icon(Icons.badge_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    // RUT
+                    TextFormField(
+                      controller: _rutController,
+                      validator: Validators.validateRut,
+                      decoration: InputDecoration(
+                        labelText: 'RUT *',
+                        hintText: '12.345.678-9',
+                        prefixIcon: const Icon(Icons.badge_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Teléfono
-                  TextFormField(
-                    controller: _phoneController,
-                    validator: Validators.validatePhone,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: 'Teléfono *',
-                      hintText: '+56 9 1234 5678',
-                      prefixIcon: const Icon(Icons.phone_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    // Teléfono
+                    TextFormField(
+                      controller: _phoneController,
+                      validator: Validators.validatePhone,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'Teléfono *',
+                        hintText: '9 1234 5678',
+                        prefixIcon: const Icon(Icons.phone_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Año de nacimiento
-                  TextFormField(
-                    controller: _birthYearController,
-                    validator: Validators.validateBirthYear,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(
-                      labelText: 'Año de nacimiento *',
-                      hintText: '1985',
-                      prefixIcon: const Icon(Icons.calendar_today_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    // Año de nacimiento
+                    TextFormField(
+                      controller: _birthYearController,
+                      validator: Validators.validateBirthYear,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Año de nacimiento *',
+                        hintText: '1985',
+                        prefixIcon: const Icon(Icons.calendar_today_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
-                  ),
 
-                  const SizedBox(height: 32),
+                    const SizedBox(height: 32),
 
-                  // Condiciones médicas
-                  const Text(
-                    'Condiciones médicas o especiales',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Selecciona todas las condiciones que apliquen',
-                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-                  ),
-                  const SizedBox(height: 12),
-                  // Nota importante
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.orange.shade300),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: Colors.orange.shade700,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Ingrese solo condiciones relevantes para el rescate; no registre enfermedades o datos sensibles que no sean útiles para la emergencia.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade800,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Tabs de categorías
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      children: [
-                        TabBar(
-                          controller: _tabController,
-                          labelColor: Colors.blue.shade700,
-                          unselectedLabelColor: Colors.grey.shade600,
-                          indicatorColor: Colors.blue.shade700,
-                          tabs: const [
-                            Tab(text: 'Enfermedades Crónicas'),
-                            Tab(text: 'Movilidad y Sentidos'),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 300,
-                          child: TabBarView(
-                            controller: _tabController,
-                            children: _conditionCategories.entries.map((entry) {
-                              return ListView(
-                                padding: const EdgeInsets.all(16),
-                                children: entry.value.map((condition) {
-                                  final isSelected = _selectedConditions
-                                      .contains(condition);
-                                  return CheckboxListTile(
-                                    title: Text(condition),
-                                    value: isSelected,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        if (value == true) {
-                                          _selectedConditions.add(condition);
-                                        } else {
-                                          _selectedConditions.remove(condition);
-                                        }
-                                      });
-                                    },
-                                    activeColor: Colors.blue.shade700,
-                                  );
-                                }).toList(),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Condiciones seleccionadas
-                  if (_selectedConditions.isNotEmpty) ...[
+                    // Condiciones médicas
                     const Text(
-                      'Condiciones seleccionadas:',
+                      'Condiciones médicas',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: _selectedConditions.map((condition) {
-                        return Chip(
-                          label: Text(condition),
-                          deleteIcon: const Icon(Icons.close, size: 18),
-                          onDeleted: () {
-                            setState(() {
-                              _selectedConditions.remove(condition);
-                            });
-                          },
-                          backgroundColor: Colors.blue.shade50,
-                          labelStyle: TextStyle(color: Colors.blue.shade700),
-                        );
-                      }).toList(),
+                    Text(
+                      'Selecciona todas las condiciones que apliquen',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                  ],
-
-                  // Otra condición especial
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: TextFormField(
-                          controller: _otherConditionController,
-                          decoration: InputDecoration(
-                            labelText: 'Otra condición especial (opcional)',
-                            hintText: 'Ingrese otra condición no listada',
-                            prefixIcon:
-                                const Icon(Icons.medical_services_outlined),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey.shade50,
+                    const SizedBox(height: 12),
+                    // Nota importante
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.orange.shade300),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.orange.shade700,
+                            size: 20,
                           ),
-                          onFieldSubmitted: (_) => _addOtherCondition(),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        height: 56,
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade700,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.add, color: Colors.white),
-                          onPressed: _addOtherCondition,
-                          tooltip: 'Agregar condición',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  // Nota adicional para otra condición
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade200),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          color: Colors.blue.shade700,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Ingrese solo condiciones relevantes para el rescate; no registre enfermedades o datos sensibles que no sean útiles para la emergencia.',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade800,
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Ingrese solo condiciones relevantes para el rescate; no registre enfermedades o datos sensibles que no sean útiles para la emergencia.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade800,
+                              ),
                             ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Tabs de categorías
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey.shade300),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        children: [
+                          TabBar(
+                            controller: _tabController,
+                            labelColor: Colors.blue.shade700,
+                            unselectedLabelColor: Colors.grey.shade600,
+                            indicatorColor: Colors.blue.shade700,
+                            tabs: const [
+                              Tab(text: 'Enfermedades Crónicas'),
+                              Tab(text: 'Movilidad y Sentidos'),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 300,
+                            child: TabBarView(
+                              controller: _tabController,
+                              children: _conditionCategories.entries.map((
+                                entry,
+                              ) {
+                                return ListView(
+                                  padding: const EdgeInsets.all(16),
+                                  children: entry.value.map((condition) {
+                                    final isSelected = _selectedConditions
+                                        .contains(condition);
+                                    return CheckboxListTile(
+                                      title: Text(condition),
+                                      value: isSelected,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          if (value == true) {
+                                            _selectedConditions.add(condition);
+                                          } else {
+                                            _selectedConditions.remove(
+                                              condition,
+                                            );
+                                          }
+                                        });
+                                      },
+                                      activeColor: Colors.blue.shade700,
+                                    );
+                                  }).toList(),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Condiciones seleccionadas
+                    if (_selectedConditions.isNotEmpty) ...[
+                      const Text(
+                        'Condiciones seleccionadas:',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _selectedConditions.map((condition) {
+                          return Chip(
+                            label: Text(condition),
+                            deleteIcon: const Icon(Icons.close, size: 18),
+                            onDeleted: () {
+                              setState(() {
+                                _selectedConditions.remove(condition);
+                              });
+                            },
+                            backgroundColor: Colors.blue.shade50,
+                            labelStyle: TextStyle(color: Colors.blue.shade700),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+
+                    // Otra condición especial
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            controller: _otherConditionController,
+                            decoration: InputDecoration(
+                              labelText: 'Otra condición especial (opcional)',
+                              hintText: 'Ingrese otra condición no listada',
+                              prefixIcon: const Icon(
+                                Icons.medical_services_outlined,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+                            ),
+                            onFieldSubmitted: (_) => _addOtherCondition(),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade700,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(Icons.add, color: Colors.white),
+                            onPressed: _addOtherCondition,
+                            tooltip: 'Agregar condición',
                           ),
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    // Nota adicional para otra condición
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: Colors.blue.shade700,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Ingrese solo condiciones relevantes para el rescate; no registre enfermedades o datos sensibles que no sean útiles para la emergencia.',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'constants/app_colors.dart';
 import 'screens/auth/login.dart';
 import 'screens/home/home.dart';
 
@@ -15,21 +16,44 @@ class MyApp extends StatelessWidget {
       title: 'Sistema de Emergencias - Bomberos',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
         useMaterial3: true,
-        // Configuración responsiva para el tema
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        // Configurar tipografía responsiva
         textTheme: ThemeData.light().textTheme.copyWith(
-          headlineLarge: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-          headlineMedium: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-          headlineSmall: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          titleLarge: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-          titleMedium: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          titleSmall: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-          bodyLarge: const TextStyle(fontSize: 16),
-          bodyMedium: const TextStyle(fontSize: 14),
-          bodySmall: const TextStyle(fontSize: 12),
+              headlineLarge: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+              ),
+              headlineMedium: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+              headlineSmall: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              titleLarge: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+              ),
+              titleMedium: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              titleSmall: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              bodyLarge: const TextStyle(fontSize: 16),
+              bodyMedium: const TextStyle(fontSize: 14),
+              bodySmall: const TextStyle(fontSize: 12),
+            ),
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.red,
+        ).copyWith(
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
+          error: AppColors.error,
         ),
       ),
       home: const AuthChecker(),
@@ -37,7 +61,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Verifica si el usuario ya está autenticado (sistema temporal)
+/// Verifica si el usuario ya está autenticado
 class AuthChecker extends StatefulWidget {
   const AuthChecker({super.key});
 
@@ -66,13 +90,11 @@ class _AuthCheckerState extends State<AuthChecker> {
   @override
   Widget build(BuildContext context) {
     if (_isAuthenticated) {
-      // Usuario autenticado -> Ir a Home
       return HomeScreen(
         onLogout: _logout,
         userEmail: _userEmail,
       );
     }
-    // Usuario no autenticado -> Ir a Login
     return LoginScreen(onLogin: _setAuthenticated);
   }
 }

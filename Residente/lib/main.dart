@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'screens/auth/login.dart';
 import 'screens/home/resident_home.dart';
 import 'services/mock_auth_service.dart';
 
-Future<void> main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Inicializar Supabase (comentado temporalmente para pruebas)
-  // await SupabaseConfig.initialize();
-
+  
+  // Optimización: Configurar orientación y UI
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  
   runApp(const MyApp());
 }
 
@@ -20,9 +24,17 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sistema de Emergencias',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(primarySwatch: Colors.red, useMaterial3: true),
-      // Usar AuthChecker temporal para pruebas
-      home: const AuthChecker(),
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+        useMaterial3: true,
+        // Optimización: Reducir animaciones innecesarias
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          },
+        ),
+      ),
+      home: _AuthChecker(),
       routes: {
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const ResidentHomeScreen(),
@@ -31,25 +43,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Verifica si el usuario ya está autenticado (versión temporal)
-class AuthChecker extends StatefulWidget {
-  const AuthChecker({super.key});
+// Verifica si el usuario ya está autenticado (optimizado)
+class _AuthChecker extends StatelessWidget {
+  const _AuthChecker();
 
-  @override
-  State<AuthChecker> createState() => _AuthCheckerState();
-}
-
-class _AuthCheckerState extends State<AuthChecker> {
   @override
   Widget build(BuildContext context) {
     final mockAuth = MockAuthService();
-
-    if (mockAuth.isAuthenticated) {
-      // Usuario autenticado -> Ir a Home
-      return const ResidentHomeScreen();
-    } else {
-      // Usuario no autenticado -> Ir a Login
-      return const LoginScreen();
-    }
+    return mockAuth.isAuthenticated 
+        ? const ResidentHomeScreen()
+        : const LoginScreen();
   }
 }

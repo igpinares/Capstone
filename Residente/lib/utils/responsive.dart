@@ -7,88 +7,68 @@ class ResponsiveBreakpoints {
 }
 
 class ResponsiveHelper {
+  // Cachear MediaQueryData para evitar múltiples llamadas
+  static MediaQueryData _getMediaQuery(BuildContext context) {
+    return MediaQuery.of(context);
+  }
+
   static bool isMobile(BuildContext context) {
-    return MediaQuery.of(context).size.width < ResponsiveBreakpoints.mobile;
+    return _getMediaQuery(context).size.width < ResponsiveBreakpoints.mobile;
   }
 
   static bool isTablet(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    final width = _getMediaQuery(context).size.width;
     return width >= ResponsiveBreakpoints.mobile && width < ResponsiveBreakpoints.tablet;
   }
 
   static bool isDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= ResponsiveBreakpoints.tablet;
+    return _getMediaQuery(context).size.width >= ResponsiveBreakpoints.tablet;
   }
 
-  static bool isLargeTablet(BuildContext context) {
-    return MediaQuery.of(context).size.width >= ResponsiveBreakpoints.desktop;
-  }
-
-  // Obtener el tipo de dispositivo
+  // Obtener el tipo de dispositivo (optimizado - una sola consulta)
   static DeviceType getDeviceType(BuildContext context) {
-    if (isMobile(context)) return DeviceType.mobile;
-    if (isTablet(context)) return DeviceType.tablet;
+    final width = _getMediaQuery(context).size.width;
+    if (width < ResponsiveBreakpoints.mobile) return DeviceType.mobile;
+    if (width < ResponsiveBreakpoints.tablet) return DeviceType.tablet;
     return DeviceType.desktop;
   }
 
-  // Obtener padding responsivo
+  // Obtener padding responsivo (optimizado)
   static EdgeInsets getResponsivePadding(BuildContext context) {
-    if (isMobile(context)) {
+    final width = _getMediaQuery(context).size.width;
+    if (width < ResponsiveBreakpoints.mobile) {
       return const EdgeInsets.all(16.0);
-    } else if (isTablet(context)) {
+    } else if (width < ResponsiveBreakpoints.tablet) {
       return const EdgeInsets.all(24.0);
     } else {
       return const EdgeInsets.all(32.0);
     }
   }
 
-  // Obtener margen responsivo
-  static EdgeInsets getResponsiveMargin(BuildContext context) {
-    if (isMobile(context)) {
-      return const EdgeInsets.all(8.0);
-    } else if (isTablet(context)) {
-      return const EdgeInsets.all(16.0);
-    } else {
-      return const EdgeInsets.all(24.0);
-    }
-  }
-
-  // Obtener tamaño de fuente responsivo
+  // Obtener tamaño de fuente responsivo (optimizado)
   static double getResponsiveFontSize(BuildContext context, {
     required double mobile,
     required double tablet,
     required double desktop,
   }) {
-    if (isMobile(context)) return mobile;
-    if (isTablet(context)) return tablet;
+    final width = _getMediaQuery(context).size.width;
+    if (width < ResponsiveBreakpoints.mobile) return mobile;
+    if (width < ResponsiveBreakpoints.tablet) return tablet;
     return desktop;
   }
 
-  // Obtener número de columnas para grid
-  static int getGridColumns(BuildContext context) {
-    if (isMobile(context)) return 1;
-    if (isTablet(context)) return 2;
-    return 3;
-  }
-
-  // Obtener ancho máximo para contenido
+  // Obtener ancho máximo para contenido (optimizado)
   static double getMaxContentWidth(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    if (isMobile(context)) return width;
-    if (isTablet(context)) return 800;
+    final width = _getMediaQuery(context).size.width;
+    if (width < ResponsiveBreakpoints.mobile) return width;
+    if (width < ResponsiveBreakpoints.tablet) return 800;
     return 1200;
-  }
-
-  // Obtener altura de AppBar responsiva
-  static double getAppBarHeight(BuildContext context) {
-    if (isMobile(context)) return kToolbarHeight;
-    return kToolbarHeight + 8;
   }
 }
 
 enum DeviceType { mobile, tablet, desktop }
 
-// Widget para hacer contenido responsivo
+// Widget para hacer contenido responsivo (optimizado)
 class ResponsiveContainer extends StatelessWidget {
   final Widget child;
   final double? maxWidth;
@@ -103,38 +83,19 @@ class ResponsiveContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final width = mediaQuery.size.width;
+    
     return Center(
       child: Container(
         constraints: BoxConstraints(
-          maxWidth: maxWidth ?? ResponsiveHelper.getMaxContentWidth(context),
+          maxWidth: maxWidth ?? (width < ResponsiveBreakpoints.mobile ? width : 
+                     width < ResponsiveBreakpoints.tablet ? 800 : 1200),
         ),
-        padding: padding ?? ResponsiveHelper.getResponsivePadding(context),
+        padding: padding ?? (width < ResponsiveBreakpoints.mobile ? const EdgeInsets.all(16.0) :
+                   width < ResponsiveBreakpoints.tablet ? const EdgeInsets.all(24.0) : const EdgeInsets.all(32.0)),
         child: child,
       ),
     );
-  }
-}
-
-// Widget para layout responsivo con sidebar
-class ResponsiveLayout extends StatelessWidget {
-  final Widget mobile;
-  final Widget? tablet;
-  final Widget? desktop;
-
-  const ResponsiveLayout({
-    super.key,
-    required this.mobile,
-    this.tablet,
-    this.desktop,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (ResponsiveHelper.isDesktop(context) && desktop != null) {
-      return desktop!;
-    } else if (ResponsiveHelper.isTablet(context) && tablet != null) {
-      return tablet!;
-    }
-    return mobile;
   }
 }

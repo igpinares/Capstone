@@ -1,123 +1,99 @@
 import 'package:flutter/material.dart';
 
+/// Helper para diseño responsivo optimizado
 class ResponsiveHelper {
   // Breakpoints para diferentes dispositivos
   static const double mobileBreakpoint = 600;
   static const double tabletBreakpoint = 900;
   static const double desktopBreakpoint = 1200;
 
-  // Verificar si es móvil
-  static bool isMobile(BuildContext context) {
-    return MediaQuery.of(context).size.width < mobileBreakpoint;
-  }
+  /// Obtiene el ancho de pantalla
+  static double getWidth(BuildContext context) =>
+      MediaQuery.of(context).size.width;
 
-  // Verificar si es tablet
-  static bool isTablet(BuildContext context) {
-    return MediaQuery.of(context).size.width >= mobileBreakpoint &&
-           MediaQuery.of(context).size.width < tabletBreakpoint;
-  }
+  /// Obtiene la altura de pantalla
+  static double getHeight(BuildContext context) =>
+      MediaQuery.of(context).size.height;
 
-  // Verificar si es desktop
-  static bool isDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= tabletBreakpoint;
-  }
+  /// Verificar si es móvil
+  static bool isMobile(BuildContext context) =>
+      getWidth(context) < mobileBreakpoint;
 
-  // Obtener tamaño de fuente responsivo
-  static double getResponsiveFontSize(
+  /// Verificar si es tablet
+  static bool isTablet(BuildContext context) =>
+      getWidth(context) >= mobileBreakpoint &&
+      getWidth(context) < tabletBreakpoint;
+
+  /// Verificar si es desktop
+  static bool isDesktop(BuildContext context) =>
+      getWidth(context) >= tabletBreakpoint;
+
+  /// Obtener valor responsivo genérico
+  static T responsive<T>(
     BuildContext context, {
-    required double mobile,
-    required double tablet,
-    required double desktop,
+    required T mobile,
+    required T tablet,
+    required T desktop,
   }) {
     if (isMobile(context)) return mobile;
     if (isTablet(context)) return tablet;
     return desktop;
   }
 
-  // Obtener padding responsivo
-  static EdgeInsets getResponsivePadding(
+  /// Obtener tamaño de fuente responsivo
+  static double fontSize(
+    BuildContext context, {
+    required double mobile,
+    required double tablet,
+    required double desktop,
+  }) =>
+      responsive(context, mobile: mobile, tablet: tablet, desktop: desktop);
+
+  /// Obtener padding responsivo
+  static EdgeInsets padding(
     BuildContext context, {
     required EdgeInsets mobile,
     required EdgeInsets tablet,
     required EdgeInsets desktop,
-  }) {
-    if (isMobile(context)) return mobile;
-    if (isTablet(context)) return tablet;
-    return desktop;
-  }
+  }) =>
+      responsive(context, mobile: mobile, tablet: tablet, desktop: desktop);
 
-  // Obtener tamaño responsivo
-  static double getResponsiveSize(
+  /// Obtener espaciado responsivo
+  static double spacing(
     BuildContext context, {
     required double mobile,
     required double tablet,
     required double desktop,
-  }) {
-    if (isMobile(context)) return mobile;
-    if (isTablet(context)) return tablet;
-    return desktop;
-  }
+  }) =>
+      responsive(context, mobile: mobile, tablet: tablet, desktop: desktop);
 
-  // Obtener columnas para grid responsivo
-  static int getResponsiveColumns(BuildContext context) {
-    if (isMobile(context)) return 1;
-    if (isTablet(context)) return 2;
-    return 3;
-  }
+  /// Obtener tamaño de icono responsivo
+  static double iconSize(
+    BuildContext context, {
+    required double mobile,
+    required double tablet,
+    required double desktop,
+  }) =>
+      responsive(context, mobile: mobile, tablet: tablet, desktop: desktop);
 
-  // Obtener ancho máximo del contenido
-  static double getMaxContentWidth(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+  /// Obtener border radius responsivo
+  static double borderRadius(
+    BuildContext context, {
+    required double mobile,
+    required double tablet,
+    required double desktop,
+  }) =>
+      responsive(context, mobile: mobile, tablet: tablet, desktop: desktop);
+
+  /// Obtener columnas para grid responsivo
+  static int gridColumns(BuildContext context) =>
+      responsive(context, mobile: 1, tablet: 2, desktop: 3);
+
+  /// Obtener ancho máximo del contenido
+  static double maxContentWidth(BuildContext context) {
+    final screenWidth = getWidth(context);
     if (isMobile(context)) return screenWidth;
     if (isTablet(context)) return 800;
     return 1200;
-  }
-
-  // Obtener altura responsiva
-  static double getResponsiveHeight(
-    BuildContext context, {
-    required double mobile,
-    required double tablet,
-    required double desktop,
-  }) {
-    if (isMobile(context)) return mobile;
-    if (isTablet(context)) return tablet;
-    return desktop;
-  }
-
-  // Obtener espaciado responsivo
-  static double getResponsiveSpacing(
-    BuildContext context, {
-    required double mobile,
-    required double tablet,
-    required double desktop,
-  }) {
-    if (isMobile(context)) return mobile;
-    if (isTablet(context)) return tablet;
-    return desktop;
-  }
-
-  // Obtener icon size responsivo
-  static double getResponsiveIconSize(
-    BuildContext context, {
-    required double mobile,
-    required double tablet,
-    required double desktop,
-  }) {
-    if (isMobile(context)) return mobile;
-    if (isTablet(context)) return tablet;
-    return desktop;
-  }
-
-  // Obtener border radius responsivo
-  static double getResponsiveBorderRadius(
-    BuildContext context, {
-    required double mobile,
-    required double tablet,
-    required double desktop,
-  }) {
-    if (isMobile(context)) return mobile;
-    if (isTablet(context)) return tablet;
-    return desktop;
   }
 }

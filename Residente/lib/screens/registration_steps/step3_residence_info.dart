@@ -56,7 +56,6 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
     super.dispose();
   }
 
-
   void _confirmLocation() {
     if (_addressController.text.isNotEmpty) {
       setState(() {
@@ -86,9 +85,10 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
   @override
   Widget build(BuildContext context) {
     final padding = ResponsiveHelper.getResponsivePadding(context);
-    final isTablet = ResponsiveHelper.isTablet(context) ||
-                      ResponsiveHelper.isDesktop(context);
-    
+    final isTablet =
+        ResponsiveHelper.isTablet(context) ||
+        ResponsiveHelper.isDesktop(context);
+
     return Column(
       children: [
         Expanded(
@@ -129,296 +129,192 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
                     ),
                     SizedBox(height: isTablet ? 40 : 32),
 
-                  // Dirección
-                  const Text(
-                    'Dirección',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _addressController,
-                    validator: Validators.validateAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Dirección completa *',
-                      hintText: 'Calle, número, comuna, ciudad',
-                      prefixIcon: const Icon(Icons.location_on_outlined),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    // Dirección
+                    const Text(
+                      'Dirección',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
-                  ),
-                  const SizedBox(height: 12),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _confirmLocation,
-                      icon: const Icon(Icons.check_circle_outline),
-                      label: const Text('Ubicación en el mapa '),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade600,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _addressController,
+                      validator: Validators.validateAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Dirección completa *',
+                        hintText: 'Calle, número, comuna, ciudad',
+                        prefixIcon: const Icon(Icons.location_on_outlined),
+                        border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _confirmLocation,
+                        icon: const Icon(Icons.check_circle_outline),
+                        label: const Text('Ubicación en el mapa '),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade600,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                     ),
-                  ),
 
-                  // Vista previa de ubicación
-                  if (_hasConfirmedLocation) ...[
-                    const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.blue.shade200),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.map, color: Colors.blue.shade700),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Vista previa de ubicación',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            height: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Stack(
-                              children: [
-                                Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        size: 60,
-                                        color: Colors.red.shade700,
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 6,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          '🏠 Residencia',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 8,
-                                  top: 8,
-                                  child: Column(
-                                    children: [
-                                      _buildMapButton(Icons.add),
-                                      const SizedBox(height: 4),
-                                      _buildMapButton(Icons.remove),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.check_circle,
-                                      color: Colors.green.shade600,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    const Text(
-                                      '📍 Ubicación confirmada',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  _addressController.text,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '📡 Coordenadas: ${_latitudeController.text}, ${_longitudeController.text}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.amber.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.amber.shade300),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.lightbulb_outline,
-                                  color: Colors.amber.shade700,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 8),
-                                const Expanded(
-                                  child: Text(
-                                    '💡 Esta vista previa ayuda a los bomberos a localizar rápidamente tu domicilio en caso de emergencia.',
-                                    style: TextStyle(fontSize: 12),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Opción de ingresar coordenadas manualmente
-                    TextButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          _showManualCoordinates = !_showManualCoordinates;
-                        });
-                      },
-                      icon: Icon(
-                        _showManualCoordinates
-                            ? Icons.keyboard_arrow_up
-                            : Icons.keyboard_arrow_down,
-                      ),
-                      label: Text(
-                        _showManualCoordinates
-                            ? 'Ocultar coordenadas'
-                            : 'Si tienes problemas con ubicar tu residencia, tú mismo ingresa su coordenada',
-                      ),
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.blue.shade700,
-                      ),
-                    ),
-
-                    if (_showManualCoordinates) ...[
-                      const SizedBox(height: 16),
+                    // Vista previa de ubicación
+                    if (_hasConfirmedLocation) ...[
+                      const SizedBox(height: 24),
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.grey.shade50,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade300),
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.blue.shade200),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Ingresar coordenadas manualmente',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            TextFormField(
-                              controller: _latitudeController,
-                              validator: (value) =>
-                                  Validators.validateCoordinate(value, true),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                    signed: true,
+                            Row(
+                              children: [
+                                Icon(Icons.map, color: Colors.blue.shade700),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Vista previa de ubicación',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                              decoration: InputDecoration(
-                                labelText: 'Latitud (coordenada Y) *',
-                                hintText: 'Ejemplo: -33.4489',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                filled: true,
-                                fillColor: Colors.white,
-                              ),
+                              ],
                             ),
                             const SizedBox(height: 12),
-                            TextFormField(
-                              controller: _longitudeController,
-                              validator: (value) =>
-                                  Validators.validateCoordinate(value, false),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(
-                                    decimal: true,
-                                    signed: true,
+                            Container(
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          size: 60,
+                                          color: Colors.red.shade700,
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          child: const Text(
+                                            '🏠 Residencia',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                              decoration: InputDecoration(
-                                labelText: 'Longitud (coordenada X) *',
-                                hintText: 'Ejemplo: -70.6693',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                filled: true,
-                                fillColor: Colors.white,
+                                  Positioned(
+                                    right: 8,
+                                    top: 8,
+                                    child: Column(
+                                      children: [
+                                        _buildMapButton(Icons.add),
+                                        const SizedBox(height: 4),
+                                        _buildMapButton(Icons.remove),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 12),
                             Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle,
+                                        color: Colors.green.shade600,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Text(
+                                        '📍 Ubicación confirmada',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    _addressController.text,
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '📡 Coordenadas: ${_latitudeController.text}, ${_longitudeController.text}',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.amber.shade300,
+                                ),
                               ),
                               child: Row(
                                 children: [
                                   Icon(
-                                    Icons.info_outline,
-                                    color: Colors.blue.shade700,
+                                    Icons.lightbulb_outline,
+                                    color: Colors.amber.shade700,
                                     size: 20,
                                   ),
                                   const SizedBox(width: 8),
                                   const Expanded(
                                     child: Text(
-                                      '💡 Puedes obtener las coordenadas desde Google Maps: haz clic derecho en tu ubicación y selecciona las coordenadas que aparecen.',
+                                      '💡 Esta vista previa ayuda a los bomberos a localizar rápidamente tu domicilio en caso de emergencia.',
                                       style: TextStyle(fontSize: 12),
                                     ),
                                   ),
@@ -428,53 +324,166 @@ class _Step3ResidenceInfoState extends State<Step3ResidenceInfo> {
                           ],
                         ),
                       ),
+                      const SizedBox(height: 16),
+
+                      // Opción de ingresar coordenadas manualmente
+                      TextButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _showManualCoordinates = !_showManualCoordinates;
+                          });
+                        },
+                        icon: Icon(
+                          _showManualCoordinates
+                              ? Icons.keyboard_arrow_up
+                              : Icons.keyboard_arrow_down,
+                        ),
+                        label: Text(
+                          _showManualCoordinates
+                              ? 'Ocultar coordenadas'
+                              : 'Si tienes problemas con ubicar tu residencia, tú mismo ingresa su coordenada',
+                        ),
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.blue.shade700,
+                        ),
+                      ),
+
+                      if (_showManualCoordinates) ...[
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Ingresar coordenadas manualmente',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              TextFormField(
+                                controller: _latitudeController,
+                                validator: (value) =>
+                                    Validators.validateCoordinate(value, true),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                      signed: true,
+                                    ),
+                                decoration: InputDecoration(
+                                  labelText: 'Latitud (coordenada Y) *',
+                                  hintText: 'Ejemplo: -33.4489',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              TextFormField(
+                                controller: _longitudeController,
+                                validator: (value) =>
+                                    Validators.validateCoordinate(value, false),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                      signed: true,
+                                    ),
+                                decoration: InputDecoration(
+                                  labelText: 'Longitud (coordenada X) *',
+                                  hintText: 'Ejemplo: -70.6693',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.shade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline,
+                                      color: Colors.blue.shade700,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Expanded(
+                                      child: Text(
+                                        '💡 Puedes obtener las coordenadas desde Google Maps: haz clic derecho en tu ubicación y selecciona las coordenadas que aparecen.',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
-                  ],
 
-                  const SizedBox(height: 32),
+                    const SizedBox(height: 32),
 
-                  // Teléfonos de contacto
-                  const Text(
-                    'Contactos de Emergencia',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 16),
-
-                  TextFormField(
-                    controller: _mainPhoneController,
-                    validator: Validators.validatePhone,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: 'Teléfono principal *',
-                      hintText: '+56 9 1234 5678',
-                      helperText:
-                          'Teléfono principal de contacto para emergencias',
-                      prefixIcon: const Icon(Icons.phone),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    // Teléfonos de contacto
+                    const Text(
+                      'Contactos de Emergencia',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 16),
 
-                  TextFormField(
-                    controller: _altPhoneController,
-                    keyboardType: TextInputType.phone,
-                    decoration: InputDecoration(
-                      labelText: 'Teléfono alternativo (opcional)',
-                      hintText: '+56 9 8765 4321',
-                      helperText:
-                          'Teléfono de contacto secundario (familiar, vecino, etc.)',
-                      prefixIcon: const Icon(Icons.phone_android),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
+                    TextFormField(
+                      controller: _mainPhoneController,
+                      validator: Validators.validatePhone,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'Teléfono principal *',
+                        hintText: '9 1234 5678',
+                        helperText:
+                            'Teléfono principal de contacto para emergencias',
+                        prefixIcon: const Icon(Icons.phone),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
-                  ),
+                    const SizedBox(height: 20),
+
+                    TextFormField(
+                      controller: _altPhoneController,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        labelText: 'Teléfono alternativo (opcional)',
+                        hintText: '9 8765 4321',
+                        helperText:
+                            'Teléfono de contacto secundario (familiar, vecino, etc.)',
+                        prefixIcon: const Icon(Icons.phone_android),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                      ),
+                    ),
                   ],
                 ),
               ),
